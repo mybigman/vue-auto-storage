@@ -1,6 +1,6 @@
 # vue-auto-storage
 
-> An automatic storage plugin for Vue2, persist the data with localStorage.
+> An automatic storage plugin for Vue2, persist the data with localStorage(default).
 
 [![vue-js](https://img.shields.io/badge/vue.js-2.x-brightgreen.svg?maxAge=604800)](https://vuejs.org/)
 [![downloads](https://img.shields.io/npm/dt/vue-auto-storage.svg)](http://npm-stats.com/~packages/vue-auto-storage)
@@ -23,8 +23,8 @@
 ## Advantages
 
 - Simple API.
-- Small bundle size: 3.86KB (1.42KB gzipped).
-- No dependencies.
+- ~~Small bundle size.~~
+- ~~No dependencies.~~
 
 ## Attention
 
@@ -43,18 +43,18 @@ yarn add vue-auto-storage
 
 ### Registration
 
-main.js
+`main.js`
 
 ```javascript
 import Vue from "vue";
 import App from "./App.vue";
-import AutoStorage from "vue-auto-storage";
+import { createStorageMixin } from "vue-auto-storage";
 
-Vue.use(AutoStorage);
-
+const storageMixin = createStorageMixin();
 // or with options
+// const storageMixin = createStorageMixin({ debounce: 100 });
 
-// Vue.use(AutoStorage, { debounce: 100 });
+Vue.mixin(storageMixin);
 
 new Vue({
   render: (h) => h(App),
@@ -67,21 +67,17 @@ Add `autoStorage` filed to Vue component's options object, declare the keypath o
 
 ```javascript
 export default {
-  name: "ComponentName",
+  name: "my-component",
 
   autoStorage: ["a.b", "c.0.d", "f"],
 
   data() {
     return {
       a: { b: "" },
-
       c: [{ d: "" }, { e: "" }],
-
       f: "",
     };
   },
-
-  created() {},
 };
 ```
 
@@ -100,20 +96,33 @@ export default class MyComponent extends Vue {
 }
 ```
 
-~~If you want persist an array's first item, use `array.0` instead of `array[0]`, [why?](https://github.com/vuejs/vue/blob/653aac2c57d15f0e93a2c1cc7e6fad156658df19/src/core/observer/watcher.js#L86-L89)~~
+Persist state of Vuex:
+
+```javascript
+import { createVuexPlugin } from "vue-auto-storage";
+
+new Vuex({
+  state: {},
+  modules: {},
+  plugins: [createVuexPlugin()],
+});
+```
+
+If you want persist an array's first item, use `array.0` instead of `array[0]`, [why?](https://github.com/vuejs/vue/blob/653aac2c57d15f0e93a2c1cc7e6fad156658df19/src/core/observer/watcher.js#L86-L89)
 
 ## Methods
 
-| Function   | Description                                                   | Parameters Type | Example                          |
-| :--------- | :------------------------------------------------------------ | :-------------- | :------------------------------- |
-| clear(key) | Clear storage. If no parameters, clear all AutoStorage cache. | `String`, `N/A` | `this.$autoStorage.clear("a.b")` |
+| Function   | Description                                       | Parameters Type | Example                          |
+| :--------- | :------------------------------------------------ | :-------------- | :------------------------------- |
+| clear(key) | Clear storage. If no parameters, clear all cache. | `String`, `N/A` | `this.$autoStorage.clear("a.b")` |
 
 ## Plugin Configurations
 
-| Property | Description                                | Type                                                                                             | Default        |
-| :------- | :----------------------------------------- | :----------------------------------------------------------------------------------------------- | :------------- |
-| debounce | Debounce time of watchers, unit: `ms`.     | `Number`                                                                                         | 300            |
-| storage  | Any object following the Storage protocol. | `Object` [more](https://github.com/zh-rocco/vue-auto-storage/blob/master/types/index.d.ts#L1-L6) | `localStorage` |
+| Property | Description                                | Type     | Default        |
+| :------- | :----------------------------------------- | :------- | :------------- |
+| prefix   | Prefix string of key name.                 | `String` | `_vas_`        |
+| debounce | Debounce time of watchers, unit: `ms`.     | `Number` | 300            |
+| storage  | Any object following the Storage protocol. | `Object` | `localStorage` |
 
 Stay tuned for more configurations.
 
@@ -126,7 +135,7 @@ yarn dev
 ## Build
 
 ```bash
-yarn build:lib
+yarn build
 ```
 
 ## Test
@@ -134,10 +143,6 @@ yarn build:lib
 ```bash
 yarn test
 ```
-
-## Todo Features
-
-- Support Vuex.
 
 ## License
 
