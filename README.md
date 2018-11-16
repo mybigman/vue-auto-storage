@@ -65,9 +65,37 @@ new Vue({
 
 Add `autoStorage` filed to Vue component's options object, declare the keypath of `data` you want to persist.
 
+`*.vue`
+
 ```javascript
 export default {
   name: "my-component",
+
+  autoStorage: ["a.b", "c.0.d", "f"],
+
+  data() {
+    return {
+      a: { b: "" },
+      c: [{ d: "" }, { e: "" }],
+      f: "",
+    };
+  },
+};
+```
+
+Partial Registration
+
+`*.vue`
+
+```javascript
+import { createStorageMixin } from "vue-auto-storage";
+
+const storageMixin = createStorageMixin();
+
+export default {
+  name: "my-component",
+
+  mixins: [storageMixin],
 
   autoStorage: ["a.b", "c.0.d", "f"],
 
